@@ -1,6 +1,4 @@
-// live2d_path 参数建议使用绝对路径
 const live2d_path = 'https://fastly.jsdelivr.net/npm/live2d-widgets@1.0.0-rc.3/dist/';
-// const live2d_path = '/dist/';
 
 // 封装异步加载资源的方法
 function loadExternalResource(url, type) {
@@ -25,7 +23,6 @@ function loadExternalResource(url, type) {
   });
 }
 
-// 如果担心手机上显示效果不佳，可以通过 `if (screen.width >= 768)` 来判断是否加载
 (async () => {
   // 避免图片资源跨域问题
   const OriginalImage = window.Image;
@@ -35,24 +32,36 @@ function loadExternalResource(url, type) {
     return img;
   };
   window.Image.prototype = OriginalImage.prototype;
+
   // 加载 waifu.css waifu-tips.js
   await Promise.all([
     loadExternalResource(live2d_path + 'waifu.css', 'css'),
     loadExternalResource(live2d_path + 'waifu-tips.js', 'js')
   ]);
-  // 配置选项的具体用法见 README.md
+
+  // 初始化 Live2D 看板娘
   initWidget({
     waifuPath: live2d_path + 'waifu-tips.json',
-    // cdnPath: 'https://fastly.jsdelivr.net/gh/fghrsh/live2d_api/',
     cubism2Path: live2d_path + 'live2d.min.js',
     cubism5Path: 'https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js',
     tools: ['hitokoto', 'asteroids', 'switch-model', 'switch-texture', 'photo', 'info', 'quit'],
     logLevel: 'warn',
     drag: true,
   });
-})();
 
-console.log(`\n%cLive2D%cWidget%c\n`, 'padding: 8px; background: #cd3e45; font-weight: bold; font-size: large; color: white;', 'padding: 8px; background: #ff5450; font-size: large; color: #eee;', '');
+  // 强制设置 Live2D 容器为 fixed 定位（右下角）
+  const style = document.createElement('style');
+  style.textContent = `
+    #waifu {
+      position: fixed !important;
+      right: 20px !important;   /* 靠右（改为 left: 20px 靠左） */
+      bottom: 20px !important;  /* 靠下 */
+      z-index: 99999 !important;
+      pointer-events: auto !important;
+    }
+  `;
+  document.head.appendChild(style);
+})();
 
 /*
 く__,.ヘヽ.        /  ,ー､ 〉
